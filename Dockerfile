@@ -8,12 +8,12 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --only=production
+RUN npm install
 
 # Copy seluruh kode aplikasi ke dalam container
 COPY . .
 
-# Expose port yang akan digunakan oleh aplikasi Node.js
+# Expose port yang digunakan oleh aplikasi
 EXPOSE 3000
 
 # Perintah untuk menjalankan aplikasi
