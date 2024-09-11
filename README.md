@@ -1,0 +1,1 @@
+ docker run -e GOOGLE_APPLICATION_CREDENTIALS="/home/googleauth.json" -v /home/googleauth.json:/home/googleauth.json -p 3001:3000 googlevts

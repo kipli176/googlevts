@@ -18,6 +18,12 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 // Konfigurasi Google Cloud Text-to-Speech
 const ttsClient = new textToSpeech.TextToSpeechClient();
 app.use(cors());
+app.use((req, res, next) => {
+  if (req.url.includes('output.mp3')) {
+    res.setHeader('Cache-Control', 'no-store');
+  }
+  next();
+});
 app.use(express.static('public'));
 
 app.post('/upload', upload.single('image'), async (req, res) => {
@@ -54,7 +60,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     // Hapus file upload setelah diproses
     await fs.promises.unlink(req.file.path);
 
-    res.json({ text: text, audioUrl: '/output.mp3' });
+    res.json({ text: text, audioUrl: `/output.mp3?t=${timestamp}` });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Terjadi kesalahan saat memproses gambar' });
