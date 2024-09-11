@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Speech dengan Google Generative AI</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .image-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .result {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .audio-player {
+            margin-top: 20px;
+            width: 100%;
+        }
+        .image-display {
+            max-width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Image to Speech dengan Google Generative AI</h1>
+        <div class="image-container">
+            <!-- Predefined Image -->
+            <img id="image_display" src="ca0ae_kampus.jpeg" alt="Click to analyze this image" class="image-display img-fluid">
+        </div>
+        <div id="result" class="result"></div>
+        <audio id="audio_player" controls class="audio-player" style="display: none;"></audio>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const imageDisplay = document.getElementById('image_display');
+        const result = document.getElementById('result');
+        const audioPlayer = document.getElementById('audio_player');
+
+        // Add click event to the image
+        imageDisplay.onclick = () => {
+            processImage(imageDisplay.src);
+        };
+
+        function processImage(imageUrl) {
+            result.textContent = 'Memproses gambar...';
+            audioPlayer.style.display = 'none';
+
+            fetch(imageUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                const file = new File([blob], 'image.jpg', { type: blob.type });
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                return fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                result.textContent = `Teks terdeteksi:\n\n${data.text}`;
+                audioPlayer.src = data.audioUrl;
+                audioPlayer.style.display = 'block';
+                audioPlayer.play();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                result.textContent = 'Terjadi kesalahan saat memproses gambar';
+            });
+        }
+    </script>
+</body>
+</html>
